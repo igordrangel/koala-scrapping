@@ -1,4 +1,4 @@
 export interface SendKeysInterface {
-	xPath: string;
-	value: string;
+  xPath: string;
+  value: string;
 }
