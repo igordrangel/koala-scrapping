@@ -6,7 +6,7 @@
   "types": "index.d.ts",
   "typings": "index.d.ts",
   "scripts": {
-    "test": "jest --config ./jestconfig.json",
+    "test": "jest --config ../jestconfig.json",
     "build": "tsc && npm run format",
     "copy-default-files": "copy \"./LICENSE\" \"./dist\" && copy \"./README.md\" \"./dist\" && copy \"./package.json\" \"./dist\"",
     "format": "prettier --write \"../src/**/*.ts\" \"../dist/**/*.js\"",
