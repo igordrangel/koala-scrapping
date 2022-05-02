@@ -208,7 +208,7 @@ export abstract class KoalaScrappingDom<CustomDataType> {
         defaultViewport: null,
         args,
         slowMo: this.option?.slowMo ?? 0,
-        useDataDir: './puppeteer-cache',
+        userDataDir: './puppeteer-cache',
       };
 
       if (!this.option.browser || this.option.browser === BrowserEnum.chromium) {
