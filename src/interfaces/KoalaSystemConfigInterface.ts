@@ -1,4 +1,5 @@
 import { BrowserEnum } from '../enums/BrowserEnum';
+import { CaptchaConfigInterface } from './CaptchaConfigInterface';
 import { SendKeysInterface } from './SendKeysInterface';
 
 export interface KoalaSystemConfigInterface<CustomDataType> {
@@ -20,4 +21,5 @@ export interface KoalaSystemConfigInterface<CustomDataType> {
   blockReloadPage?: boolean;
   loadMinimalist?: boolean;
   customData?: CustomDataType;
+  captchaConfig?: CaptchaConfigInterface;
 }

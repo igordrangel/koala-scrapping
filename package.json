@@ -45,6 +45,10 @@
   "dependencies": {
     "@koalarx/utils": "^1.0.97",
     "html-table-to-json": "^1.0.0",
-    "puppeteer": "^13.7.0"
+    "puppeteer": "^13.7.0",
+    "puppeteer-extra": "^3.3.0",
+    "puppeteer-extra-plugin-recaptcha": "^3.6.0",
+    "puppeteer-extra-plugin-user-data-dir": "^2.3.1",
+    "puppeteer-extra-plugin-user-preferences": "^2.3.1"
   }
 }

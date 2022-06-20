@@ -1,4 +1,5 @@
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-extra';
+import RecaptchaPlugin from 'puppeteer-extra-plugin-recaptcha';
 import { Browser, ElementHandle, Frame, Page } from 'puppeteer';
 import { KoalaSystemConfigInterface } from './interfaces/KoalaSystemConfigInterface';
 import { BrowserEnum } from './enums/BrowserEnum';
@@ -196,7 +197,6 @@ export abstract class KoalaScrappingDom<CustomDataType> {
         '--password-store=basic',
         '--use-gl=swiftshader',
         '--use-mock-keychain',
-        '--no-sandbox',
         '--disable-setuid-sandbox',
         '-wait-for-browser',
       ];
@@ -243,6 +243,17 @@ export abstract class KoalaScrappingDom<CustomDataType> {
             }
           });
         }
+      }
+      if (this.option?.captchaConfig) {
+        puppeteer.use(
+          RecaptchaPlugin({
+            provider: {
+              id: this.option.captchaConfig?.id,
+              token: this.option.captchaConfig?.token,
+            },
+            visualFeedback: true,
+          }),
+        );
       }
     }
   }
