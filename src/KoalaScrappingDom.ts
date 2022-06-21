@@ -248,6 +248,18 @@ export abstract class KoalaScrappingDom<CustomDataType> {
         userDataDir: './puppeteer-cache',
       };
 
+      if (this.option?.captchaConfig) {
+        puppeteer.use(
+          RecaptchaPlugin({
+            provider: {
+              id: this.option.captchaConfig?.id,
+              token: this.option.captchaConfig?.token,
+            },
+            visualFeedback: true,
+          }),
+        );
+      }
+
       if (!this.option.browser || this.option.browser === BrowserEnum.chromium) {
         launchOptions.product = 'chrome';
       } else {
@@ -280,17 +292,6 @@ export abstract class KoalaScrappingDom<CustomDataType> {
             }
           });
         }
-      }
-      if (this.option?.captchaConfig) {
-        puppeteer.use(
-          RecaptchaPlugin({
-            provider: {
-              id: this.option.captchaConfig?.id,
-              token: this.option.captchaConfig?.token,
-            },
-            visualFeedback: true,
-          }),
-        );
       }
     }
   }
