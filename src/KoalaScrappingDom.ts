@@ -27,6 +27,10 @@ export abstract class KoalaScrappingDom<CustomDataType> {
 
   public async closeDOM() {
     if (this.browser.isConnected()) {
+      if (this.option.allowDownload) {
+        fs.rmSync(this.downloadPath, { recursive: true });
+      }
+
       await delay(300);
       await this.browser.close();
     }
@@ -86,7 +90,7 @@ export abstract class KoalaScrappingDom<CustomDataType> {
 
   public getDownloadedFiles() {
     if (fs.existsSync(this.downloadPath)) {
-      const contentDir = fs.readdirSync(this.downloadPath, { encoding: 'base64' });
+      const contentDir = fs.readdirSync(this.downloadPath);
       const files = [];
 
       contentDir.forEach((filepath) =>
