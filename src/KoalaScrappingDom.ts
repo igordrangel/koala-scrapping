@@ -78,9 +78,7 @@ export abstract class KoalaScrappingDom<CustomDataType> {
   }
 
   public async decodeRecaptcha() {
-    await this.page.solveRecaptchas().catch((e) => {
-      throw new Error(e.error);
-    });
+    return this.page.solveRecaptchas();
   }
 
   protected async openTab(url: string) {
