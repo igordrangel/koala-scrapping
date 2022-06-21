@@ -85,7 +85,11 @@ export abstract class KoalaScrappingDom<CustomDataType> {
   }
 
   public getDownloadedFiles() {
-    return fs.readdirSync(this.downloadPath, { encoding: 'base64' });
+    if (fs.existsSync(this.downloadPath)) {
+      return fs.readdirSync(this.downloadPath, { encoding: 'base64' });
+    }
+
+    return [];
   }
 
   protected async openTab(url: string) {
