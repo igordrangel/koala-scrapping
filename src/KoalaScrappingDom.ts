@@ -27,7 +27,7 @@ export abstract class KoalaScrappingDom<CustomDataType> {
 
   public async closeDOM() {
     if (this.browser.isConnected()) {
-      if (this.option.allowDownload) {
+      if (this.option.allowDownload && fs.existsSync(this.downloadPath)) {
         fs.rmSync(this.downloadPath, { recursive: true });
       }
 
