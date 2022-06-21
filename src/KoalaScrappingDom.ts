@@ -9,6 +9,8 @@ import { toCamelCase } from '@koalarx/utils/operators/string';
 import htmlTableToJson from 'html-table-to-json';
 import { CaptchaDecodeInterface } from './interfaces/CaptchaDecodeInterface';
 import { TwoCaptchaService } from './services/2captcha/TwoCaptchaService';
+import path from 'path';
+import fs from 'fs';
 
 export abstract class KoalaScrappingDom<CustomDataType> {
   protected browser: Browser;
@@ -16,6 +18,7 @@ export abstract class KoalaScrappingDom<CustomDataType> {
   protected idCaptcha: string;
   private mensagemAlert: string;
   private _offDialog: boolean = false;
+  private downloadPath = path.resolve('./download');
 
   /**
    * @param option | URl da página de início do processo
@@ -79,6 +82,10 @@ export abstract class KoalaScrappingDom<CustomDataType> {
 
   public async decodeRecaptcha() {
     return this.page.solveRecaptchas();
+  }
+
+  public getDownloadedFiles() {
+    return fs.readdirSync(this.downloadPath, { encoding: 'base64' });
   }
 
   protected async openTab(url: string) {
@@ -290,6 +297,12 @@ export abstract class KoalaScrappingDom<CustomDataType> {
             }
           });
         }
+      }
+      if (this.option.allowDownload) {
+        this.page.client().send('Page.setDownloadBehavior', {
+          behavior: 'allow',
+          downloadPath: this.downloadPath,
+        });
       }
     }
   }

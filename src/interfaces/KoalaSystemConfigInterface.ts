@@ -22,4 +22,5 @@ export interface KoalaSystemConfigInterface<CustomDataType> {
   loadMinimalist?: boolean;
   customData?: CustomDataType;
   captchaConfig?: CaptchaConfigInterface;
+  allowDownload?: boolean;
 }
