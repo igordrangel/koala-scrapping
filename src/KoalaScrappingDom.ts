@@ -88,6 +88,17 @@ export abstract class KoalaScrappingDom<CustomDataType> {
     return this.page.solveRecaptchas();
   }
 
+  public async waitDownloadFiles() {
+    if (fs.existsSync(this.downloadPath)) {
+      let contentDir = [];
+
+      do {
+        await delay(1000);
+        contentDir = fs.readdirSync(this.downloadPath);
+      } while (contentDir.filter((filepath) => filepath.indexOf('.crdownload') >= 0).length > 0);
+    }
+  }
+
   public getDownloadedFiles() {
     if (fs.existsSync(this.downloadPath)) {
       const contentDir = fs.readdirSync(this.downloadPath);

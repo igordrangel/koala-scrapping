@@ -1,4 +1,3 @@
-import { delay } from '@koalarx/utils/operators/delay';
 import { KoalaScrappingSystem } from '../KoalaScrappingSystem';
 jest.setTimeout(10000000);
 test('Scrapping Google', async () => {
@@ -39,7 +38,7 @@ test('Download Test', async () => {
     public async getFiles() {
       await this.init();
       await this.click('/html/body/p[1]/a');
-      await delay(1000);
+      await this.waitDownloadFiles();
       const files = this.getDownloadedFiles();
       await this.closeDOM();
       return files;
