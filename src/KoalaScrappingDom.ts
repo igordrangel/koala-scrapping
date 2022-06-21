@@ -210,7 +210,6 @@ export abstract class KoalaScrappingDom<CustomDataType> {
         '--disable-default-apps',
         '--disable-dev-shm-usage',
         '--disable-domain-reliability',
-        '--disable-extensions',
         '--disable-features=AudioServiceOutOfProcess',
         '--disable-hang-monitor',
         '--disable-ipc-flooding-protection',
