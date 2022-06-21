@@ -7,6 +7,8 @@ import { delay } from '@koalarx/utils/operators/delay';
 import { toCamelCase } from '@koalarx/utils/operators/string';
 
 import htmlTableToJson from 'html-table-to-json';
+import { CaptchaDecodeInterface } from './interfaces/CaptchaDecodeInterface';
+import { TwoCaptchaService } from './services/2captcha/TwoCaptchaService';
 
 export abstract class KoalaScrappingDom<CustomDataType> {
   protected browser: Browser;
@@ -27,6 +29,60 @@ export abstract class KoalaScrappingDom<CustomDataType> {
     }
   }
 
+  public async reloadPage() {
+    if (!this.option.blockReloadPage) {
+      await this.page.reload({
+        timeout: 240000,
+      });
+    }
+  }
+
+  public blockReloadPage(block: boolean) {
+    this.option.blockReloadPage = block;
+  }
+
+  public async offDialog() {
+    this._offDialog = true;
+  }
+
+  public async decodeCaptcha(options: CaptchaDecodeInterface) {
+    const b64ImageCaptcha = await this.page
+      .waitForXPath(options.xPathIframeImage)
+      .then(async (el: ElementHandle<HTMLIFrameElement>) => {
+        return (await el.screenshot({ encoding: 'base64', type: 'png' })) as string;
+      })
+      .catch((e) => {
+        throw e;
+      });
+
+    let textCaptcha: string;
+    switch (options.enterprise) {
+      case '2Captcha':
+        const twoCaptcha = await TwoCaptchaService.init(this.option.captchaConfig.token)
+          .solve({
+            image: b64ImageCaptcha,
+            maxAttempts: 60,
+          })
+          .catch((e) => {
+            throw e;
+          });
+        textCaptcha = twoCaptcha.text;
+        this.idCaptcha = twoCaptcha.id;
+        break;
+      default:
+        throw new Error('Empresa de quebra de captcha não suportado.');
+    }
+    if (textCaptcha) {
+      await this.pasteValueInField(options.xPathInputCaptcha, textCaptcha);
+    }
+  }
+
+  public async decodeRecaptcha() {
+    await this.page.solveRecaptchas().catch((e) => {
+      throw new Error(e.error);
+    });
+  }
+
   protected async openTab(url: string) {
     this.page = await this.browser.newPage();
     await this.initObservableDialog();
@@ -35,10 +91,6 @@ export abstract class KoalaScrappingDom<CustomDataType> {
 
   protected async getLastPage(): Promise<Page> {
     return (await this.browser.pages())[(await this.browser.pages()).length - 1];
-  }
-
-  public async offDialog() {
-    this._offDialog = true;
   }
 
   protected async getDataFromTable(xPath: string): Promise<object[]> {
@@ -70,20 +122,6 @@ export abstract class KoalaScrappingDom<CustomDataType> {
   protected async closeTab() {
     await this.page.close();
     this.page = await this.getLastPage();
-  }
-
-  private async initObservableDialog() {
-    await this.page.removeAllListeners('dialog');
-    this.page.on('dialog', async (dialog) => {
-      this.mensagemAlert = await dialog.message();
-      if ((this.option.ignoredMessages ?? []).find((message) => message === this.mensagemAlert)) {
-        await dialog.accept();
-      } else {
-        if (!this._offDialog) {
-          await dialog.dismiss();
-        }
-      }
-    });
   }
 
   protected async goTo(url: string) {
@@ -256,18 +294,6 @@ export abstract class KoalaScrappingDom<CustomDataType> {
         );
       }
     }
-  }
-
-  public async reloadPage() {
-    if (!this.option.blockReloadPage) {
-      await this.page.reload({
-        timeout: 240000,
-      });
-    }
-  }
-
-  public blockReloadPage(block: boolean) {
-    this.option.blockReloadPage = block;
   }
 
   protected async waitForXpathIsNotVisible(xPath: string, waitFor: number = 2000) {
@@ -650,5 +676,19 @@ export abstract class KoalaScrappingDom<CustomDataType> {
       });
     });
     await this.click(xPathClick);
+  }
+
+  private async initObservableDialog() {
+    await this.page.removeAllListeners('dialog');
+    this.page.on('dialog', async (dialog) => {
+      this.mensagemAlert = await dialog.message();
+      if ((this.option.ignoredMessages ?? []).find((message) => message === this.mensagemAlert)) {
+        await dialog.accept();
+      } else {
+        if (!this._offDialog) {
+          await dialog.dismiss();
+        }
+      }
+    });
   }
 }

@@ -44,6 +44,7 @@
   },
   "dependencies": {
     "@koalarx/utils": "^1.0.97",
+    "2captcha-node": "^2.2.1",
     "html-table-to-json": "^1.0.0",
     "puppeteer": "^13.7.0",
     "puppeteer-extra": "^3.3.0",
