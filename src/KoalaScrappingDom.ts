@@ -102,11 +102,9 @@ export abstract class KoalaScrappingDom<CustomDataType> {
   public getDownloadedFiles() {
     if (fs.existsSync(this.downloadPath)) {
       const contentDir = fs.readdirSync(this.downloadPath);
-      const files = [];
+      const files: Buffer[] = [];
 
-      contentDir.forEach((filepath) =>
-        files.push(fs.readFileSync(`${this.downloadPath}/${filepath}`, { encoding: 'base64' })),
-      );
+      contentDir.forEach((filepath) => files.push(fs.readFileSync(`${this.downloadPath}/${filepath}`)));
       return files;
     }
 
