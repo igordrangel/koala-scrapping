@@ -27,8 +27,8 @@ export abstract class KoalaScrappingDom<CustomDataType> {
 
   public async closeDOM() {
     if (this.browser.isConnected()) {
-      if (this.option.allowDownload && fs.existsSync(this.option.downloadPath)) {
-        fs.rmSync(this.option.downloadPath, { recursive: true });
+      if (this.option.allowDownload && fs.existsSync(this.downloadPath)) {
+        fs.rmSync(this.downloadPath, { recursive: true });
       }
 
       await delay(300);
@@ -89,22 +89,22 @@ export abstract class KoalaScrappingDom<CustomDataType> {
   }
 
   public async waitDownloadFiles() {
-    if (fs.existsSync(this.option.downloadPath)) {
+    if (fs.existsSync(this.downloadPath)) {
       let contentDir = [];
 
       do {
         await delay(1000);
-        contentDir = fs.readdirSync(this.option.downloadPath);
+        contentDir = fs.readdirSync(this.downloadPath);
       } while (contentDir.filter((filepath) => filepath.indexOf('.crdownload') >= 0).length > 0);
     }
   }
 
   public getDownloadedFiles() {
-    if (fs.existsSync(this.option.downloadPath)) {
-      const contentDir = fs.readdirSync(this.option.downloadPath);
+    if (fs.existsSync(this.downloadPath)) {
+      const contentDir = fs.readdirSync(this.downloadPath);
       const files: Buffer[] = [];
 
-      contentDir.forEach((filepath) => files.push(fs.readFileSync(`${this.option.downloadPath}/${filepath}`)));
+      contentDir.forEach((filepath) => files.push(fs.readFileSync(`${this.downloadPath}/${filepath}`)));
       return files;
     }
 
@@ -322,10 +322,12 @@ export abstract class KoalaScrappingDom<CustomDataType> {
         }
       }
       if (this.option.allowDownload) {
-        if (!this.option.downloadPath) this.option.downloadPath = this.downloadPath;
+        if (this.option.downloadPath) this.downloadPath = path.resolve(this.option.downloadPath);
+        if (!fs.existsSync(this.downloadPath)) fs.mkdirSync(this.downloadPath);
+
         this.page.client().send('Page.setDownloadBehavior', {
           behavior: 'allow',
-          downloadPath: this.option.downloadPath,
+          downloadPath: this.downloadPath,
         });
       }
     }
