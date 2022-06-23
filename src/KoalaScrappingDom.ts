@@ -18,6 +18,7 @@ export abstract class KoalaScrappingDom<CustomDataType> {
   protected idCaptcha: string;
   private mensagemAlert: string;
   private _offDialog: boolean = false;
+  private downloadPath = path.resolve('./download');
 
   /**
    * @param option | URl da página de início do processo
@@ -321,7 +322,7 @@ export abstract class KoalaScrappingDom<CustomDataType> {
         }
       }
       if (this.option.allowDownload) {
-        if (!this.option.downloadPath) this.option.downloadPath = path.resolve('./download');
+        if (!this.option.downloadPath) this.option.downloadPath = this.downloadPath;
         this.page.client().send('Page.setDownloadBehavior', {
           behavior: 'allow',
           downloadPath: this.option.downloadPath,
