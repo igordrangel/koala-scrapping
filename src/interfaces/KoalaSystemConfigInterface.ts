@@ -23,4 +23,5 @@ export interface KoalaSystemConfigInterface<CustomDataType> {
   customData?: CustomDataType;
   captchaConfig?: CaptchaConfigInterface;
   allowDownload?: boolean;
+  downloadPath?: string;
 }

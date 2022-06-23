@@ -9,8 +9,8 @@ import { toCamelCase } from '@koalarx/utils/operators/string';
 import htmlTableToJson from 'html-table-to-json';
 import { CaptchaDecodeInterface } from './interfaces/CaptchaDecodeInterface';
 import { TwoCaptchaService } from './services/2captcha/TwoCaptchaService';
-import path from 'path';
 import fs from 'fs';
+import path from 'path';
 
 export abstract class KoalaScrappingDom<CustomDataType> {
   protected browser: Browser;
@@ -18,7 +18,6 @@ export abstract class KoalaScrappingDom<CustomDataType> {
   protected idCaptcha: string;
   private mensagemAlert: string;
   private _offDialog: boolean = false;
-  private downloadPath = path.resolve('./download');
 
   /**
    * @param option | URl da página de início do processo
@@ -27,8 +26,8 @@ export abstract class KoalaScrappingDom<CustomDataType> {
 
   public async closeDOM() {
     if (this.browser.isConnected()) {
-      if (this.option.allowDownload && fs.existsSync(this.downloadPath)) {
-        fs.rmSync(this.downloadPath, { recursive: true });
+      if (this.option.allowDownload && fs.existsSync(this.option.downloadPath)) {
+        fs.rmSync(this.option.downloadPath, { recursive: true });
       }
 
       await delay(300);
@@ -89,22 +88,22 @@ export abstract class KoalaScrappingDom<CustomDataType> {
   }
 
   public async waitDownloadFiles() {
-    if (fs.existsSync(this.downloadPath)) {
+    if (fs.existsSync(this.option.downloadPath)) {
       let contentDir = [];
 
       do {
         await delay(1000);
-        contentDir = fs.readdirSync(this.downloadPath);
+        contentDir = fs.readdirSync(this.option.downloadPath);
       } while (contentDir.filter((filepath) => filepath.indexOf('.crdownload') >= 0).length > 0);
     }
   }
 
   public getDownloadedFiles() {
-    if (fs.existsSync(this.downloadPath)) {
-      const contentDir = fs.readdirSync(this.downloadPath);
+    if (fs.existsSync(this.option.downloadPath)) {
+      const contentDir = fs.readdirSync(this.option.downloadPath);
       const files: Buffer[] = [];
 
-      contentDir.forEach((filepath) => files.push(fs.readFileSync(`${this.downloadPath}/${filepath}`)));
+      contentDir.forEach((filepath) => files.push(fs.readFileSync(`${this.option.downloadPath}/${filepath}`)));
       return files;
     }
 
@@ -322,9 +321,10 @@ export abstract class KoalaScrappingDom<CustomDataType> {
         }
       }
       if (this.option.allowDownload) {
+        if (!this.option.downloadPath) this.option.downloadPath = path.resolve('./download');
         this.page.client().send('Page.setDownloadBehavior', {
           behavior: 'allow',
-          downloadPath: this.downloadPath,
+          downloadPath: this.option.downloadPath,
         });
       }
     }
