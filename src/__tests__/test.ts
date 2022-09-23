@@ -47,3 +47,23 @@ test('Download Test', async () => {
 
   expect((await download.getFiles())?.length > 0).toEqual(true);
 });
+
+test('Datatable Test', async () => {
+  const datatable = new (class Datatable extends KoalaScrappingSystem<any> {
+    constructor() {
+      super({
+        url: 'https://datatables.net',
+        loadMinimalist: true,
+      });
+    }
+
+    public async getData() {
+      await this.init();
+      const items = await this.getDataFromTable<any>('//*[@id="example"]', 1000);
+      await this.closeDOM();
+      return items;
+    }
+  })();
+
+  expect((await datatable.getData())?.length > 0).toEqual(true);
+});

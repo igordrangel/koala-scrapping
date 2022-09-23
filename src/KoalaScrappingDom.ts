@@ -121,25 +121,27 @@ export abstract class KoalaScrappingDom<CustomDataType> {
     return (await this.browser.pages())[(await this.browser.pages()).length - 1];
   }
 
-  protected async getDataFromTable(xPath: string): Promise<object[]> {
-    return await this.getTable(xPath).then(async (tableHtml) => {
-      const tmpResult = htmlTableToJson.parse(tableHtml).results[0];
-      const result: object[] = [];
-      tmpResult.forEach((obj: { [key: string]: string }) => {
-        const newObj: { [key: string]: string } = {};
-        Object.keys(obj).forEach((key) => {
-          let value = obj[key];
-          if (value.indexOf('/', 2) >= 0 && value.indexOf('/', 5) >= 0 && value.length === 10) {
-            const arrValue = value.split('/');
-            value = `${arrValue[2]}-${arrValue[1]}-${arrValue[0]}`;
-          }
+  protected async getDataFromTable<LineType>(xPath: string, waitUntil: number = 10000): Promise<LineType[]> {
+    return await this.getTable(xPath, waitUntil)
+      .then(async (tableHtml) => {
+        const tmpResult = htmlTableToJson.parse(tableHtml).results[0];
+        const result: LineType[] = [];
+        tmpResult.forEach((obj: { [key: string]: string }) => {
+          const newObj: { [key: string]: string } = {};
+          Object.keys(obj).forEach((key) => {
+            let value = obj[key];
+            if (value.indexOf('/', 2) >= 0 && value.indexOf('/', 5) >= 0 && value.length === 10) {
+              const arrValue = value.split('/');
+              value = `${arrValue[2]}-${arrValue[1]}-${arrValue[0]}`;
+            }
 
-          newObj[toCamelCase(key)] = value;
+            newObj[toCamelCase(key)] = value;
+          });
+          result.push(newObj as any);
         });
-        result.push(newObj);
-      });
-      return result;
-    });
+        return result;
+      })
+      .catch(() => []);
   }
 
   protected async switchLastTab() {
@@ -539,12 +541,14 @@ export abstract class KoalaScrappingDom<CustomDataType> {
     }
   }
 
-  private async getTable(xPath: string): Promise<string> {
-    return await this.page.waitForXPath(xPath).then(async (el: ElementHandle<HTMLTableElement>) => {
-      return el.evaluate((table) => {
-        return table.outerHTML;
+  private async getTable(xPath: string, waitUntil: number = 10000): Promise<string> {
+    return await this.page
+      .waitForXPath(xPath, { timeout: waitUntil })
+      .then(async (el: ElementHandle<HTMLTableElement>) => {
+        return el.evaluate((table) => {
+          return table.outerHTML;
+        });
       });
-    });
   }
 
   protected async getValueCheckbox(xpath: string): Promise<boolean> {
