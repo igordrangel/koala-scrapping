@@ -1,6 +1,6 @@
 {
   "name": "@koalarx/scrapping",
-  "version": "1.0.21",
+  "version": "1.1.0",
   "description": "Uma abstração utilizando Puppeteer para Web Scrapping",
   "main": "index.js",
   "types": "index.d.ts",
