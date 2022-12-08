@@ -5,7 +5,6 @@ test('Scrapping Google', async () => {
     constructor() {
       super({
         url: 'https://google.com',
-        loadMinimalist: true,
       });
     }
 
