@@ -10,7 +10,7 @@ test('Scrapping Google', async () => {
     }
 
     public async search(wordSearch: string) {
-      await this.init(false);
+      await this.init();
       await this.pasteValueInField('/html/body/div[1]/div[3]/form/div[1]/div[1]/div[1]/div/div[2]/input', wordSearch);
       await this.click('/html/body/div[1]/div[3]/form/div[1]/div[1]/div[4]/center/input[1]');
 
@@ -36,7 +36,7 @@ test('Download Test', async () => {
     }
 
     public async getFiles() {
-      await this.init(false);
+      await this.init();
       await this.click('/html/body/p[1]/a');
       await this.waitDownloadFiles();
       const files = this.getDownloadedFiles();
@@ -58,7 +58,7 @@ test('Datatable Test', async () => {
     }
 
     public async getData() {
-      await this.init(false);
+      await this.init();
       const items = await this.getDataFromTable<any>('//*[@id="example"]', 1000);
       await this.closeDOM();
       return items;
