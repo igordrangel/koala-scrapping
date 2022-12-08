@@ -11,6 +11,7 @@ import { CaptchaDecodeInterface } from './interfaces/CaptchaDecodeInterface';
 import { TwoCaptchaService } from './services/2captcha/TwoCaptchaService';
 import fs from 'fs';
 import path from 'path';
+import { koala } from '@koalarx/utils';
 
 export abstract class KoalaScrappingDom<CustomDataType> {
   protected browser: Browser;
@@ -229,7 +230,7 @@ export abstract class KoalaScrappingDom<CustomDataType> {
 
   protected async init(headless: boolean = true, devtools: boolean = false) {
     if (!this.browser) {
-      const args = [
+      const args = koala([
         '--autoplay-policy=user-gesture-required',
         '--disable-background-networking',
         '--disable-background-timer-throttling',
@@ -266,7 +267,11 @@ export abstract class KoalaScrappingDom<CustomDataType> {
         '--use-mock-keychain',
         '--disable-setuid-sandbox',
         '-wait-for-browser',
-      ];
+      ])
+        .array()
+        .merge(this.option?.proxyCredentials ? [`--proxy-server=${this.option.proxyCredentials.host}`] : [])
+        .getValue();
+
       if (!headless) args.push('--start-maximized');
       const launchOptions: any = {
         headless,
@@ -300,6 +305,13 @@ export abstract class KoalaScrappingDom<CustomDataType> {
 
       this.page = await this.getLastPage();
       await this.initObservableDialog();
+
+      if (this.option?.proxyCredentials) {
+        await this.page.authenticate({
+          username: this.option.proxyCredentials.username,
+          password: this.option.proxyCredentials.password,
+        });
+      }
 
       await this.goTo(this.option.url);
       if (this.option.browser === BrowserEnum.firefox) {
