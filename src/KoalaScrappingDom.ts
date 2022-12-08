@@ -269,7 +269,7 @@ export abstract class KoalaScrappingDom<CustomDataType> {
         '-wait-for-browser',
       ])
         .array()
-        .merge(this.option?.proxyCredentials ? [`--proxy-server=${this.option.proxyCredentials.host}`] : [])
+        .merge(this.option?.proxy ? [`--proxy-server=${this.option.proxy.host}`] : [])
         .getValue();
 
       if (!headless) args.push('--start-maximized');
@@ -306,10 +306,10 @@ export abstract class KoalaScrappingDom<CustomDataType> {
       this.page = await this.getLastPage();
       await this.initObservableDialog();
 
-      if (this.option?.proxyCredentials) {
+      if (this.option?.proxy?.username && this.option?.proxy?.password) {
         await this.page.authenticate({
-          username: this.option.proxyCredentials.username,
-          password: this.option.proxyCredentials.password,
+          username: this.option.proxy.username,
+          password: this.option.proxy.password,
         });
       }
 

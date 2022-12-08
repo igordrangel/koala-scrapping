@@ -24,9 +24,9 @@ export interface KoalaSystemConfigInterface<CustomDataType> {
   captchaConfig?: CaptchaConfigInterface;
   allowDownload?: boolean;
   downloadPath?: string;
-  proxyCredentials?: {
+  proxy?: {
     host: string;
-    username: string;
-    password: string;
-  }
+    username?: string;
+    password?: string;
+  };
 }
