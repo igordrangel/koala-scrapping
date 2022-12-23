@@ -304,7 +304,9 @@ export abstract class KoalaScrappingDom<CustomDataType> {
       this.browser = await puppeteer.launch(launchOptions);
 
       this.page = await this.getLastPage();
-      await this.initObservableDialog();
+      await this.page.setUserAgent(
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36',
+      );
 
       if (this.option?.proxy?.username && this.option?.proxy?.password) {
         await this.page.authenticate({
@@ -312,6 +314,8 @@ export abstract class KoalaScrappingDom<CustomDataType> {
           password: this.option.proxy.password,
         });
       }
+      
+      await this.initObservableDialog();
 
       await this.goTo(this.option.url);
       if (this.option.browser === BrowserEnum.firefox) {
