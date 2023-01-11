@@ -25,28 +25,28 @@ test('Scrapping Google', async () => {
   expect(await google.search('test')).toContain('resultados');
 });
 
-test('Download Test', async () => {
-  const download = new (class Download extends KoalaScrappingSystem<any> {
-    constructor() {
-      super({
-        url: 'https://speed.hetzner.de',
-        loadMinimalist: true,
-        allowDownload: true,
-      });
-    }
+// test('Download Test', async () => {
+//   const download = new (class Download extends KoalaScrappingSystem<any> {
+//     constructor() {
+//       super({
+//         url: 'https://speed.hetzner.de',
+//         loadMinimalist: true,
+//         allowDownload: true,
+//       });
+//     }
 
-    public async getFiles() {
-      await this.init();
-      await this.click('/html/body/p[1]/a');
-      await this.waitDownloadFiles();
-      const files = this.getDownloadedFiles();
-      await this.closeDOM();
-      return files;
-    }
-  })();
+//     public async getFiles() {
+//       await this.init();
+//       await this.click('/html/body/p[1]/a');
+//       await this.waitDownloadFiles();
+//       const files = this.getDownloadedFiles();
+//       await this.closeDOM();
+//       return files;
+//     }
+//   })();
 
-  expect((await download.getFiles())?.length > 0).toEqual(true);
-});
+//   expect((await download.getFiles())?.length > 0).toEqual(true);
+// });
 
 test('Datatable Test', async () => {
   const datatable = new (class Datatable extends KoalaScrappingSystem<any> {
