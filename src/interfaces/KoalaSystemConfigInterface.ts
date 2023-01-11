@@ -29,4 +29,5 @@ export interface KoalaSystemConfigInterface<CustomDataType> {
     username?: string;
     password?: string;
   };
+  ignoreHTTPSErrors?: boolean;
 }

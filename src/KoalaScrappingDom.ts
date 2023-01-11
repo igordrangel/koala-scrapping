@@ -281,6 +281,7 @@ export abstract class KoalaScrappingDom<CustomDataType> {
         args,
         slowMo: this.option?.slowMo ?? 0,
         userDataDir: './puppeteer-cache',
+        ignoreHTTPSErrors: this.option?.ignoreHTTPSErrors ?? false,
       };
 
       if (this.option?.captchaConfig) {
