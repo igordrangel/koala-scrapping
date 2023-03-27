@@ -9,7 +9,7 @@ export class KoalaScrappingDomFrame {
   protected idCaptcha: string;
   private mensagemAlert: string;
 
-  constructor(protected frame: Frame) { }
+  constructor(protected frame: Frame) {}
 
   public async getDataFromTable<LineType>(xPath: string, waitUntil: number = 10000): Promise<LineType[]> {
     return await this.getTable(xPath, waitUntil)

@@ -103,16 +103,17 @@ test('Frame Test', async () => {
   const framePage = new (class FramePage extends KoalaScrappingSystem<any> {
     constructor() {
       super({
-        url: 'https://www.htmllion.com/get-and-send-value-of-input-field-inside-an-iframe.html'
+        url: 'https://www.htmllion.com/get-and-send-value-of-input-field-inside-an-iframe.html',
       });
     }
 
     public async run() {
-      await this.init(false);
-      return await new Promise<boolean>(async resolve => {
+      await this.init();
+      return await new Promise<boolean>(async (resolve) => {
         this.scrapOnFrame('inpIframe')
-          .then(frame => {
-            frame.pasteValueInField('/html/body/input', 'teste')
+          .then((frame) => {
+            frame
+              .pasteValueInField('/html/body/input', 'teste')
               .then(() => {
                 this.closeDOM();
                 resolve(true);
@@ -126,11 +127,11 @@ test('Frame Test', async () => {
           .catch((err) => {
             console.error(err);
             this.closeDOM();
-            resolve(false)
+            resolve(false);
           });
       });
     }
   })();
 
-  expect((await framePage.run())).toEqual(true);
+  expect(await framePage.run()).toEqual(true);
 });
