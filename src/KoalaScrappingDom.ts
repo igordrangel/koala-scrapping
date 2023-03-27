@@ -27,13 +27,13 @@ export abstract class KoalaScrappingDom<CustomDataType> {
    */
   protected constructor(private option: KoalaSystemConfigInterface<CustomDataType>) {}
 
-  public async scrapOnFrame(identifier: string) {
+  public async scrapOnFrame(urlIdentifier: string) {
     return new Promise<KoalaScrappingDomFrame>((resolve, reject) => {
-      const frame = this.page.frames().find((f) => f.name() === identifier);
+      const frame = this.page.frames().find((f) => f.url().includes(urlIdentifier));
       if (frame) {
         resolve(new KoalaScrappingDomFrame(frame));
       } else {
-        reject(new Error(`The identifier ${identifier} for frame was not found.`));
+        reject(new Error(`The identifier ${urlIdentifier} for frame was not found.`));
       }
     });
   }

@@ -110,7 +110,7 @@ test('Frame Test', async () => {
     public async run() {
       await this.init();
       return await new Promise<boolean>(async (resolve) => {
-        this.scrapOnFrame('inpIframe')
+        this.scrapOnFrame('https://www.htmllion.com/examples/iframe/iframe_page.html')
           .then((frame) => {
             frame
               .pasteValueInField('/html/body/input', 'teste')
