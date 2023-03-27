@@ -12,6 +12,7 @@ import { TwoCaptchaService } from './services/2captcha/TwoCaptchaService';
 import fs from 'fs';
 import path from 'path';
 import { koala } from '@koalarx/utils';
+import { KoalaScrappingDomFrame } from './KoalaScrappingDomFrame';
 
 export abstract class KoalaScrappingDom<CustomDataType> {
   protected browser: Browser;
@@ -24,7 +25,18 @@ export abstract class KoalaScrappingDom<CustomDataType> {
   /**
    * @param option | URl da página de início do processo
    */
-  protected constructor(private option: KoalaSystemConfigInterface<CustomDataType>) {}
+  protected constructor(private option: KoalaSystemConfigInterface<CustomDataType>) { }
+
+  public async scrapOnFrame(identifier: string) {
+    return new Promise<KoalaScrappingDomFrame>((resolve, reject) => {
+      const frame = this.page.frames().find((f) => f.name() === identifier);
+      if (frame) {
+        resolve(new KoalaScrappingDomFrame(frame));
+      } else {
+        reject(new Error(`The identifier ${identifier} for frame was not found.`))
+      }
+    })
+  }
 
   public async closeDOM() {
     if (this.browser.isConnected()) {
@@ -315,7 +327,7 @@ export abstract class KoalaScrappingDom<CustomDataType> {
           password: this.option.proxy.password,
         });
       }
-      
+
       await this.initObservableDialog();
 
       await this.goTo(this.option.url);
