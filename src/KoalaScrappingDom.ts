@@ -546,16 +546,9 @@ export abstract class KoalaScrappingDom<CustomDataType> {
       });
   }
 
-  protected verifyFrameIsOpened(identifier: string) {
+  protected verifyFrameIsOpened(urlIdentifier: string) {
     return new Promise<boolean>(async (resolve) => {
-      let frame: Frame = await this.page.frames().find((f) => f.name() === identifier);
-      if (!frame) {
-        const element = await this.page.$(identifier);
-        if (element) {
-          frame = await element.contentFrame();
-        }
-      }
-
+      const frame: Frame = this.page.frames().find((f) => f.url().includes(urlIdentifier));
       resolve(!!frame);
     });
   }
