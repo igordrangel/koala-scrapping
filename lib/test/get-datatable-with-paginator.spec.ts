@@ -9,7 +9,7 @@ interface DatatableItem {
   salary: string
 }
 
-test('Test RPA get datatable', async () => {
+test('Test RPA get datatable with paginator', async () => {
   const page = TestVars.page
 
   await page.goTo('https://datatables.net')

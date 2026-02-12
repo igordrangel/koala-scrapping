@@ -3,7 +3,8 @@ import { TestVars } from './vars'
 
 beforeAll(async () => {
   TestVars.browser = await new Browser({
-    minimalist: true,
+    minimalist: false,
+    headless: false,
   }).init()
   TestVars.page = TestVars.browser.page
 })

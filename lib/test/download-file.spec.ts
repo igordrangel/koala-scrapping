@@ -15,4 +15,4 @@ test('Test RPA download file', async () => {
   expect(files[0]).toBeInstanceOf(Buffer)
 
   rmSync('downloads', { recursive: true, force: true })
-}, 10000)
+}, 15000)

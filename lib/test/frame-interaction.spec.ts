@@ -19,4 +19,4 @@ test('Frame Interaction', async () => {
 
   expect(content).toBeInstanceOf(Array)
   expect(content.length > 0).toBeTruthy()
-}, 60000)
+})
