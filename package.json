@@ -11,14 +11,14 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
     "globals": "^17.3.0",
-    "typescript-eslint": "^8.55.0",
-    "vitest": "^4.0.18"
+    "typescript-eslint": "^8.55.0"
   },
   "peerDependencies": {
-    "typescript": "^5"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "@koalarx/utils": "^4.2.1",
+    "html-table-to-json": "^1.0.0",
     "puppeteer": "^24.37.2"
   }
 }

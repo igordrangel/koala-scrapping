@@ -1,30 +1,31 @@
 import puppeteer, { Browser as PuppeteerBrowser } from 'puppeteer'
+import type { BrowserConfig } from './@types/browser-config'
 import { BROWSER_ARGS } from './constants/args'
-import { DOM } from './Dom'
-
-export interface BrowserConfig {
-  headless?: boolean
-  proxy?: string
-  minimalist?: boolean
-  slowMo?: number
-}
+import { Page } from './Page'
+import { existsSync, mkdirSync } from 'node:fs'
 
 export class Browser {
-  private browser?: PuppeteerBrowser
-  private dom?: DOM
+  private _browser?: PuppeteerBrowser
+  private _page?: Page
 
   constructor(private config: BrowserConfig) {}
 
   get page() {
-    if (!this.dom) {
+    if (!this._page) {
       throw new Error('DOM is not lauched. Certificate you call init method.')
     }
 
-    return this.dom
+    return this._page
   }
 
   async init() {
     const { headless, proxy, minimalist, slowMo } = this.config
+
+    const downloadPath = this.config.downloadFolderPath ?? './downloads'
+
+    if (!existsSync(downloadPath)) {
+      mkdirSync(downloadPath)
+    }
 
     const args = BROWSER_ARGS.concat(
       proxy ? [`--proxy-server=${proxy}`] : [],
@@ -35,6 +36,10 @@ export class Browser {
       headless,
       defaultViewport: null,
       slowMo,
+      downloadBehavior: {
+        policy: 'allow',
+        downloadPath,
+      },
     })
 
     const page = await browser.pages().then((pages) => pages[0]!)
@@ -57,20 +62,20 @@ export class Browser {
       })
     }
 
-    this.browser = browser
-    this.dom = new DOM(page)
+    this._browser = browser
+    this._page = new Page(page)
 
     return this
   }
 
   async close() {
-    if (!this.browser) {
+    if (!this._browser) {
       throw new Error(
         'Browser is not lauched. Certificate you call init method.',
       )
     }
 
-    await this.page.close()
-    await this.browser.close()
+    await this._page.close()
+    await this._browser.close()
   }
 }

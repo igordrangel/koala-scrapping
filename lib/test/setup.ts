@@ -5,7 +5,7 @@ beforeAll(async () => {
   TestVars.browser = await new Browser({
     minimalist: true,
   }).init()
-  TestVars.dom = TestVars.browser.page
+  TestVars.page = TestVars.browser.page
 })
 
 afterAll(async () => {
