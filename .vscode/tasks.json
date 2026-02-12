@@ -1,0 +1,17 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "bun: start:debug",
+      "type": "shell",
+      "command": "bun",
+      "args": ["run", "start:debug"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": [],
+      "isBackground": true
+    }
+  ]
+}

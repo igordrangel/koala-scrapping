@@ -1,59 +1,25 @@
 {
-  "name": "@koalarx/scrapping",
-  "version": "1.5.4",
-  "description": "Uma abstração utilizando Puppeteer para Web Scrapping",
-  "main": "index.js",
-  "types": "index.d.ts",
-  "typings": "index.d.ts",
-  "scripts": {
-    "test": "jest --config ../jestconfig.json",
-    "local-test": "jest --config jestconfig.json",
-    "build": "tsc && npm run format",
-    "copy-default-files": "copy \"./LICENSE\" \"./dist\" && copy \"./README.md\" \"./dist\" && copy \"./package.json\" \"./dist\"",
-    "format": "prettier --write \"../src/**/*.ts\" \"../dist/**/*.js\"",
-    "lint": "tslint -p tsconfig.json",
-    "prepare": "npm run build",
-    "prepublishOnly": "npm test",
-    "preversion": "npm run lint",
-    "version": "git add -A src",
-    "postversion": "git push && git push --tags",
-    "deploy": "npm run copy-default-files && npm publish ./dist --access public",
-    "deploy:hotfix": "npm version patch && npm run deploy",
-    "deploy:feature": "npm version minor && npm run deploy",
-    "deploy:release": "npm version major && npm run deploy"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/igordrangel/koala-scrapping.git"
-  },
-  "keywords": [
-    "koala",
-    "Web Scrapping"
-  ],
-  "author": "Igor D. Rangel",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/igordrangel/koala-scrapping/issues"
-  },
-  "homepage": "https://github.com/igordrangel/koala-scrapping#readme",
+  "version": "2.0.0",
+  "name": "koala-scrapping",
+  "type": "module",
   "devDependencies": {
-    "@types/jest": "^27.4.1",
-    "@types/node": "^17.0.30",
-    "jest": "^27.5.1",
-    "prettier": "^2.6.2",
-    "ts-jest": "^27.1.4",
-    "tslint": "^6.1.3",
-    "tslint-config-prettier": "^1.18.0",
-    "typescript": "^4.6.4"
+    "@eslint/js": "^10.0.1",
+    "@types/bun": "latest",
+    "@types/jest": "^30.0.0",
+    "@vitest/eslint-plugin": "^1.6.7",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
+    "globals": "^17.3.0",
+    "typescript-eslint": "^8.55.0",
+    "vitest": "^4.0.18"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
   },
   "dependencies": {
-    "@koalarx/utils": "^1.0.101",
-    "2captcha-node": "^2.2.1",
-    "html-table-to-json": "^1.0.0",
-    "puppeteer": "^13.7.0",
-    "puppeteer-extra": "^3.3.0",
-    "puppeteer-extra-plugin-recaptcha": "^3.6.0",
-    "puppeteer-extra-plugin-user-data-dir": "^2.3.1",
-    "puppeteer-extra-plugin-user-preferences": "^2.3.1"
+    "@koalarx/utils": "^4.2.1",
+    "puppeteer": "^24.37.2",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
   }
 }

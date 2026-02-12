@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "bun",
+      "request": "launch",
+      "name": "Debug Bun File",
+      "program": "${file}", // This runs the currently active file
+      "cwd": "${workspaceFolder}",
+      "stopOnEntry": false // Set to true to pause on the first line
+    },
+  ]
+}

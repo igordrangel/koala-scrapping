@@ -1,0 +1,7 @@
+[test]
+root = "lib/test"
+timeoutMs = 60000
+preload = ["./lib/test/setup.ts"]
+
+[loader]
+".ts" = "tsx"
