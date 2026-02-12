@@ -27,6 +27,6 @@ jobs:
         run: npm config set "//registry.npmjs.org/:_authToken" "${{ secrets.NPM_TOKEN }}"
       
       - name: 📚 Publish @koalarx/nest
-        run: npm publish
+        run: cd dist && npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
