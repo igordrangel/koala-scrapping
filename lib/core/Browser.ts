@@ -1,8 +1,6 @@
-import puppeteer from 'puppeteer-extra'
+import puppeteer, { Browser as PuppeteerBrowser } from 'puppeteer'
 import { BROWSER_ARGS } from './constants/args'
 import { DOM } from './Dom'
-import { Browser as PuppeteerBrowser } from 'puppeteer'
-import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 
 export interface BrowserConfig {
   headless?: boolean
@@ -15,9 +13,7 @@ export class Browser {
   private browser?: PuppeteerBrowser
   private dom?: DOM
 
-  constructor(private config: BrowserConfig) {
-    puppeteer.use(StealthPlugin())
-  }
+  constructor(private config: BrowserConfig) {}
 
   get page() {
     if (!this.dom) {
@@ -30,8 +26,12 @@ export class Browser {
   async init() {
     const { headless, proxy, minimalist, slowMo } = this.config
 
+    const args = BROWSER_ARGS.concat(
+      proxy ? [`--proxy-server=${proxy}`] : [],
+    ).concat(headless ? [] : ['--start-maximized'])
+
     const browser = await puppeteer.launch({
-      args: BROWSER_ARGS.concat(proxy ? [`--proxy-server=${proxy}`] : []),
+      args,
       headless,
       defaultViewport: null,
       slowMo,
@@ -40,7 +40,10 @@ export class Browser {
     const page = await browser.pages().then((pages) => pages[0]!)
 
     if (minimalist) {
+      page.removeAllListeners('request')
+
       await page.setRequestInterception(true)
+
       page.on('request', (req) => {
         if (
           req.resourceType() === 'stylesheet' ||
