@@ -128,7 +128,7 @@ const dados = await page.getDatatable<DadosTabela>('#example', {
 // Extrai todas as páginas automaticamente!
 ```
 
-📝 **Exemplo prático:** Ver [get-datatable.spec.ts](lib/test/get-datatable.spec.ts)
+📝 **Exemplo prático:** Ver [get-datatable-with-paginator.spec.ts](https://github.com/igordrangel/koala-scrapping/blob/main/lib/test/get-datatable-with-paginator.spec.ts)
 
 ### Download de Arquivos
 
@@ -141,7 +141,7 @@ const arquivos = await page.getDownloadedFiles()
 console.log(arquivos[0])  // Buffer do arquivo
 ```
 
-📝 **Exemplo prático:** Ver [download-file.spec.ts](lib/test/download-file.spec.ts)
+📝 **Exemplo prático:** Ver [download-file.spec.ts](https://github.com/igordrangel/koala-scrapping/blob/main/lib/test/download-file.spec.ts)
 
 ### Interação com Frames e iFrames
 
@@ -181,7 +181,7 @@ const conteudo = await frame.content('#resultado p')
 console.log(conteudo)
 ```
 
-📝 **Exemplo prático:** Ver [frame-interaction.spec.ts](lib/test/frame-interaction.spec.ts)
+📝 **Exemplo prático:** Ver [frame-interaction.spec.ts](https://github.com/igordrangel/koala-scrapping/blob/main/lib/test/frame-interaction.spec.ts)
 
 ### Web Scraping Completo
 
@@ -210,7 +210,7 @@ const conteudo = await page.content('#mw-content-text p')
 console.log(conteudo)  // Array com paragrafos
 ```
 
-📝 **Exemplo prático:** Ver [search-wikipidea.spec.ts](lib/test/search-wikipidea.spec.ts)
+📝 **Exemplo prático:** Ver [search-wikipidea.spec.ts](https://github.com/igordrangel/koala-scrapping/blob/main/lib/test/search-wikipidea.spec.ts)
 
 ## Configuração Avançada
 
