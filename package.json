@@ -1,9 +1,13 @@
 {
-  "version": "2.0.0",
+  "version": "2.0.2",
   "name": "@koalarx/scrapping",
   "type": "module",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && cp README.md package.json dist"
+    "build": "tsc -p tsconfig.build.json && cp README.md package.json dist",
+    "prepare:hotfix": "bun pm version patch --no-git-tag-version",
+    "prepare:feature": "bun pm version minor --no-git-tag-version",
+    "prepare:release": "bun pm version major --no-git-tag-version",
+    "prepare:only-tag": "echo 'Creating tag without version bump'"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
