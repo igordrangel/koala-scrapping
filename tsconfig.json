@@ -5,11 +5,13 @@
     "target": "ESNext",
     "module": "Preserve",
     "moduleDetection": "force",
+    "declaration": true,
     "jsx": "react-jsx",
+    "baseUrl": "./",
     "outDir": "./dist",
     "allowJs": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./lib/*"]
     },
 
     // Bundler mode
@@ -30,11 +32,8 @@
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false
   },
-  "include": [
-    "lib/**/*",
-    "lib/**/*.spec.ts"
-  ],
   "exclude": [
+    "lib/test",
     "node_modules",
     "dist"
   ]

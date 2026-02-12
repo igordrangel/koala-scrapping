@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "module": "commonJs",
+    "declaration": true,
+    "removeComments": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "es2022",
+    "sourceMap": false,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "paths": {
+      "@/*": [
+        "./lib/*"
+      ]
+    },
+    "skipLibCheck": true,
+    "strict": false,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false,
+    "resolveJsonModule": true,
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "lib/test",
+    "eslint.config.mts",
+  ]
+}
