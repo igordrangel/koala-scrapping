@@ -1,0 +1,118 @@
+#!/bin/bash
+
+# Hook post-commit para criar tags automáticas e fazer push
+# Comportamento diferente por branch:
+# - develop/main/master: criar tag + push
+# - outras branches: apenas push (sem tag)
+
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+
+# Comportamento diferente por branch
+# - develop/main/master: criar tag
+# - outras branches: só fazer push sem tag
+is_develop=false
+if [ "$current_branch" = "develop" ] || [ "$current_branch" = "main" ] || [ "$current_branch" = "master" ]; then
+  is_develop=true
+fi
+
+repo_root=$(git rev-parse --show-toplevel)
+
+# Se já está processando (via variável de ambiente), sair imediatamente
+if [ "$GIT_VERSION_IN_PROGRESS" = "1" ]; then
+  exit 0
+fi
+
+# IMPORTANTE: Esperar o pre-commit terminar de pedir a opção ao usuário
+# Se GIT_VERSION_WAITING existe, significa que o dialog ainda está aberto
+for i in {1..50}; do
+  if [ ! -f "$repo_root/.git/GIT_VERSION_WAITING" ]; then
+    break
+  fi
+  sleep 0.05
+done
+
+# Verificar se o arquivo de tipo de versão existe
+# Se não existir, sair sem fazer nada (commit normal, não de versionamento)
+if [ ! -f "$repo_root/.git/GIT_VERSION_TYPE" ]; then
+  exit 0
+fi
+
+# Ler tipo e DELETAR IMEDIATAMENTE para evitar reprocessamento no amend
+option=$(cat "$repo_root/.git/GIT_VERSION_TYPE" | tr -d '\n' | tr -d '\r')
+rm -f "$repo_root/.git/GIT_VERSION_TYPE"
+
+# Marcar que estamos processando (export para que persista nos subprocessos)
+export GIT_VERSION_IN_PROGRESS=1
+
+case "$option" in
+  1) prepare_script="prepare:hotfix"; type_name="HOTFIX" ;;
+  2) prepare_script="prepare:feature"; type_name="FEATURE" ;;
+  3) prepare_script="prepare:release"; type_name="RELEASE" ;;
+  4) prepare_script="prepare:only-tag"; type_name="APENAS ENVIAR" ;;
+  *) prepare_script="prepare:only-tag"; type_name="APENAS ENVIAR" ;;
+esac
+
+cd "$repo_root" || exit 0
+
+# Adicionar log para debug
+{
+  echo "[post-commit] Branch: $current_branch"
+  echo "[post-commit] RepoRoot: $repo_root"
+  echo "[post-commit] Opção: $option"
+  echo "[post-commit] Executando: bun run $prepare_script"
+  date
+} >> "$repo_root/.git/hooks/post-commit.log"
+
+# Executar bun version UMA ÚNICA VEZ
+bun run "$prepare_script" >> "$repo_root/.git/hooks/post-commit.log" 2>&1
+bun_exit=$?
+
+echo "[post-commit] Exit code: $bun_exit" >> "$repo_root/.git/hooks/post-commit.log"
+
+if [ $bun_exit -eq 0 ]; then
+  # Obter versão
+  version=$(grep -m 1 '"version"' package.json | cut -d'"' -f4)
+
+  # Para opções 1-3, fazer amend com as mudanças do package.json
+  if [ "$option" != "4" ]; then
+    # Adicionar package.json ao commit
+    git add package.json
+
+    # Adicionar bun.lock.json se existir
+    if [ -f "$repo_root/bun.lock.json" ]; then
+      git add bun.lock.json
+    fi
+
+    # Amend ao commit (sem editar a mensagem)
+    git commit --amend --no-edit --no-verify 2>/dev/null
+  fi
+
+  # SE FOR DEVELOP: criar tag
+  if [ "$is_develop" = "true" ]; then
+    # Obter hash
+    commit_id=$(git rev-parse --short HEAD)
+    tag_name="${version}-dev+${commit_id}"
+
+    # Criar tag (sobrescrever se existir)
+    git tag -f "$tag_name"
+
+    # Push branch e tag em um ÚNICO comando
+    # (máximo 3 tentativas)
+    for attempt in {1..3}; do
+      if git push --force-with-lease origin refs/heads/develop:refs/heads/develop "refs/tags/$tag_name:refs/tags/$tag_name" 2>/dev/null; then
+        break
+      fi
+      sleep 1
+    done
+  else
+    # NÃO é develop: fazer push SEM tag
+    for attempt in {1..3}; do
+      if git push --force-with-lease origin "$current_branch" 2>/dev/null; then
+        break
+      fi
+      sleep 1
+    done
+  fi
+fi
+
+exit 0

@@ -1,0 +1,66 @@
+#!/bin/bash
+
+# Hook post-merge para criar tags automáticas após merge
+# Similar ao post-commit mas para operações de merge
+
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+
+# Executar apenas na branch develop
+if [ "$current_branch" != "develop" ]; then
+  exit 0
+fi
+
+repo_root=$(git rev-parse --show-toplevel)
+
+# Usar opção 4 (apenas enviar) por padrão em merges
+# Não pedimos interação ao usuário em merges
+option=4
+prepare_script="prepare:only-tag"
+
+cd "$repo_root" || exit 0
+
+# Adicionar log para debug
+{
+  echo "[post-merge] Branch: $current_branch"
+  echo "[post-merge] RepoRoot: $repo_root"
+  echo "[post-merge] Opção: $option (padrão em merges)"
+  echo "[post-merge] Executando: bun run $prepare_script"
+  date
+} >> "$repo_root/.git/hooks/post-merge.log"
+
+# Executar bun version
+bun run "$prepare_script" >> "$repo_root/.git/hooks/post-merge.log" 2>&1
+bun_exit=$?
+
+echo "[post-merge] Exit code: $bun_exit" >> "$repo_root/.git/hooks/post-merge.log"
+
+if [ $bun_exit -eq 0 ]; then
+  # Obter versão
+  version=$(grep -m 1 '"version"' package.json | cut -d'"' -f4)
+
+  # Para merge, não fazemos amend (não alteramos a versão)
+  
+  # Obter hash
+  commit_id=$(git rev-parse --short HEAD)
+  tag_name="${version}-dev+${commit_id}"
+  
+  echo "[post-merge] Tag name: $tag_name" >> "$repo_root/.git/hooks/post-merge.log"
+
+  # Criar tag (sobrescrever se existir)
+  git tag -f "$tag_name" 2>&1 | tee -a "$repo_root/.git/hooks/post-merge.log"
+  echo "[post-merge] Tag criada" >> "$repo_root/.git/hooks/post-merge.log"
+
+  # Push branch e tag em um ÚNICO comando
+  # (máximo 3 tentativas)
+  echo "[post-merge] Iniciando push único (branch + tag)..." >> "$repo_root/.git/hooks/post-merge.log"
+  for attempt in {1..3}; do
+    echo "[post-merge] Tentativa $attempt" >> "$repo_root/.git/hooks/post-merge.log"
+    if git push --force-with-lease origin refs/heads/develop:refs/heads/develop "refs/tags/$tag_name:refs/tags/$tag_name" 2>&1 | tee -a "$repo_root/.git/hooks/post-merge.log"; then
+      echo "[post-merge] Push bem-sucedido" >> "$repo_root/.git/hooks/post-merge.log"
+      break
+    fi
+    sleep 1
+  done
+fi
+
+exit 0

@@ -1,0 +1,82 @@
+#!/bin/bash
+branch=$(git rev-parse --abbrev-ref HEAD)
+
+# Se já está em processamento de versioning (via post-commit que chamou --amend)
+# NÃO fazer nada
+if [ "$GIT_VERSION_IN_PROGRESS" = "1" ]; then
+  exit 0
+fi
+
+# Se o arquivo NÃO existe, precisar pedir ao usuário qual tipo de change
+if [ ! -f ".git/GIT_VERSION_TYPE" ]; then
+  # IMPORTANTE: Criar arquivo com marcador IMEDIATAMENTE para bloquear post-commit
+  # Isso garante que post-commit não rode antes do usuário confirmar a dialog
+  touch ".git/GIT_VERSION_WAITING"
+
+  if [ -t 0 ]; then
+    # Terminal interativo - usar prompt simples
+    echo "Qual tipo? 1=hotfix 2=feature 3=release 4=apenas enviar"
+    read -p "Escolha (padrão=4): " option
+    option=${option:-4}
+    echo "$option" > .git/GIT_VERSION_TYPE
+    rm -f ".git/GIT_VERSION_WAITING"
+    export GIT_VERSION_TYPE="$option"
+  else
+    # Não é terminal interativo - tentar usar diálogo gráfico
+    if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" ]]; then
+      # Windows - usar PowerShell
+      SCRIPT_DIR=$(pwd)
+      GIT_DIR=$(cd .git 2>/dev/null && pwd || echo ".git")
+
+      # Executar dialog e capturar resultado
+      dialog_output=$(powershell -NoProfile -ExecutionPolicy Bypass -File "$SCRIPT_DIR/scripts/version-dialog.ps1" -GitDir "$GIT_DIR" 2>/dev/null)
+      ps_exit=$?
+
+      if [ $ps_exit -eq 1 ]; then
+        rm -f ".git/GIT_VERSION_WAITING"
+        exit 1
+      fi
+
+      # Esperar arquivo ser criado
+      for i in {1..10}; do
+        if [ -f ".git/GIT_VERSION_TYPE" ]; then
+          break
+        fi
+        sleep 0.2
+      done
+
+      if [ ! -f ".git/GIT_VERSION_TYPE" ]; then
+        echo "4" > .git/GIT_VERSION_TYPE
+      fi
+      rm -f ".git/GIT_VERSION_WAITING"
+    else
+      # Linux/Unix - usar script de diálogo bash
+      SCRIPT_DIR=$(pwd)
+      GIT_DIR=$(cd .git 2>/dev/null && pwd || echo ".git")
+
+      # Tentar executar o diálogo Linux
+      if [ -f "$SCRIPT_DIR/scripts/version-dialog.sh" ]; then
+        bash "$SCRIPT_DIR/scripts/version-dialog.sh" "$GIT_DIR" 2>/dev/null
+        dialog_exit=$?
+
+        if [ $dialog_exit -ne 0 ] && [ ! -f ".git/GIT_VERSION_TYPE" ]; then
+          # Se falhou e não criou o arquivo, usar padrão
+          echo "4" > .git/GIT_VERSION_TYPE
+        fi
+      else
+        # Script de diálogo não encontrado, usar padrão
+        echo "4" > .git/GIT_VERSION_TYPE
+      fi
+      rm -f ".git/GIT_VERSION_WAITING"
+    fi
+  fi
+else
+  # Se GIT_VERSION_TYPE já existe e NÃO estamos em GIT_VERSION_IN_PROGRESS
+  # significa que o amend está chamando pre-commit novamente
+  # Neste caso, apenas manter o arquivo para post-commit usar
+  # Não fazer nada, deixar o arquivo lá
+  :
+fi
+
+export GIT_VERSION_TYPE=$(cat .git/GIT_VERSION_TYPE 2>/dev/null)
+exit 0
